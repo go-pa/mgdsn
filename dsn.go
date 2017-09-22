@@ -22,6 +22,7 @@ func (m *DSN) MG() (mailgun.Mailgun, error) {
 	}
 	return mailgun.NewMailgun(m.Domain, m.APIKey, m.PublicAPIKey), nil
 }
+
 // Flag.Value
 func (e *DSN) String() string {
 	if e == nil {
