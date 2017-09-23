@@ -16,33 +16,39 @@ type DSN struct {
 	PublicAPIKey string
 }
 
-func (m *DSN) MG() (mailgun.Mailgun, error) {
-	if m.Domain == "" || m.APIKey == "" || m.PublicAPIKey == "" {
-		return nil, fmt.Errorf("fields are missing: %s", m.String())
+const usageFmt = `"domain=xxx api_key=xxx public_api_key=xxx"`
+
+// Usage can be used with flag.Var(&dsn, "mailgun", mgdsn.Usage)
+const Usage = `Mailgun DSN: ` + usageFmt
+
+// Mailgun returns a configured mailgun instance
+func (d *DSN) Mailgun() (mailgun.Mailgun, error) {
+	if d.Domain == "" || d.APIKey == "" || d.PublicAPIKey == "" {
+		return nil, fmt.Errorf("fields are missing from '%s', expected format is '%s'", d.String(), usageFmt)
 	}
-	return mailgun.NewMailgun(m.Domain, m.APIKey, m.PublicAPIKey), nil
+	return mailgun.NewMailgun(d.Domain, d.APIKey, d.PublicAPIKey), nil
 }
 
-// Flag.Value
-func (e *DSN) String() string {
-	if e == nil {
+// String implements Flag.Value
+func (d *DSN) String() string {
+	if d == nil {
 		return ""
 	}
 	var res []string
-	if e.Domain != "" {
-		res = append(res, "domain="+e.Domain)
+	if d.Domain != "" {
+		res = append(res, "domain="+d.Domain)
 	}
-	if e.APIKey != "" {
-		res = append(res, "api_key="+e.APIKey)
+	if d.APIKey != "" {
+		res = append(res, "api_key="+d.APIKey)
 	}
-	if e.PublicAPIKey != "" {
-		res = append(res, "public_api_key="+e.PublicAPIKey)
-
+	if d.PublicAPIKey != "" {
+		res = append(res, "public_api_key="+d.PublicAPIKey)
 	}
 	return strings.Join(res, " ")
 }
 
-func (e *DSN) Set(value string) error {
+// Set implements flag.Value
+func (d *DSN) Set(value string) error {
 	for _, v := range strings.Split(value, " ") {
 
 		kv := strings.SplitN(v, "=", 2)
@@ -51,15 +57,19 @@ func (e *DSN) Set(value string) error {
 		}
 		switch kv[0] {
 		case "domain":
-			e.Domain = kv[1]
+			d.Domain = kv[1]
 		case "api_key":
-			e.APIKey = kv[1]
+			d.APIKey = kv[1]
 		case "public_api_key":
-			e.PublicAPIKey = kv[1]
+			d.PublicAPIKey = kv[1]
 		default:
 			return fmt.Errorf("not a known key: %s", kv[0])
 		}
-
 	}
 	return nil
+}
+
+// Get implemets flag.Getter
+func (d *DSN) Get() interface{} {
+	return d
 }
