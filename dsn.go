@@ -1,6 +1,7 @@
 package mgdsn
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -23,6 +24,9 @@ const Usage = `Mailgun DSN: ` + usageFmt
 
 // Mailgun returns a configured mailgun instance
 func (d *DSN) Mailgun() (mailgun.Mailgun, error) {
+	if d == nil {
+		return nil, errors.New("mailgun dsn is nil")
+	}
 	if d.Domain == "" || d.APIKey == "" || d.PublicAPIKey == "" {
 		return nil, fmt.Errorf("fields are missing from '%s', expected format is '%s'", d.String(), usageFmt)
 	}
