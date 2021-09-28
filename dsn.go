@@ -1,11 +1,8 @@
 package mgdsn
 
 import (
-	"errors"
 	"fmt"
 	"strings"
-
-	"gopkg.in/mailgun/mailgun-go.v1"
 )
 
 // DSN is a datasource like configuration for mailgun client configuration. It
@@ -21,17 +18,6 @@ const usageFmt = `"domain=xxx api_key=xxx public_api_key=xxx"`
 
 // Usage can be used with flag.Var(&dsn, "mailgun", mgdsn.Usage)
 const Usage = `Mailgun DSN: ` + usageFmt
-
-// Mailgun returns a configured mailgun instance
-func (d *DSN) Mailgun() (mailgun.Mailgun, error) {
-	if d == nil {
-		return nil, errors.New("mailgun dsn is nil")
-	}
-	if d.Domain == "" || d.APIKey == "" || d.PublicAPIKey == "" {
-		return nil, fmt.Errorf("fields are missing from '%s', expected format is '%s'", d.String(), usageFmt)
-	}
-	return mailgun.NewMailgun(d.Domain, d.APIKey, d.PublicAPIKey), nil
-}
 
 // String implements Flag.Value
 func (d *DSN) String() string {
@@ -54,7 +40,6 @@ func (d *DSN) String() string {
 // Set implements flag.Value
 func (d *DSN) Set(value string) error {
 	for _, v := range strings.Split(value, " ") {
-
 		kv := strings.SplitN(v, "=", 2)
 		if len(kv) < 2 {
 			return fmt.Errorf("not a valid k=v expression: %s", v)

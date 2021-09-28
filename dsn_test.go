@@ -24,26 +24,6 @@ func TestDSN(t *testing.T) {
 	}
 }
 
-func TestMailgun(t *testing.T) {
-	var v DSN
-	if _, err := v.Mailgun(); err == nil {
-		t.Fatal(v.String())
-	}
-	v.Domain = "1"
-	if _, err := v.Mailgun(); err == nil {
-		t.Fatal(v.String())
-	}
-	v.APIKey = "2"
-
-	if _, err := v.Mailgun(); err == nil {
-		t.Fatal(v.String())
-	}
-	v.PublicAPIKey = "3"
-	if _, err := v.Mailgun(); err != nil {
-		t.Fatal(err)
-	}
-}
-
 func TestNil(t *testing.T) {
 	var d *DSN
 	if d.String() != "" {
